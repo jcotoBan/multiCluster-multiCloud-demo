@@ -1,0 +1,6 @@
+Here is where you should put your token and root_pass tf vars.
+
+ie:
+
+token = ""
+root_pass = ""

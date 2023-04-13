@@ -1,0 +1,35 @@
+apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
+metadata:
+ name: propagation
+spec:
+ resourceSelectors:
+   - apiVersion: apps/v1
+     kind: Deployment
+     name: protoapp
+   - apiVersion: v1
+     kind: Service
+     name: protoappsvc
+ placement:
+   clusterAffinity:
+     clusterNames:
+       - eu
+       - ap
+       - us
+   replicaScheduling:
+     replicaDivisionPreference: Weighted
+     replicaSchedulingType: Divided
+     weightPreference:
+       staticWeightList:
+         - targetCluster:
+             clusterNames:
+               - us
+           weight: 1
+         - targetCluster:
+             clusterNames:
+               - ap
+           weight: 1
+         - targetCluster:
+             clusterNames:
+               - eu
+           weight: 1
