@@ -14,7 +14,7 @@ systemctl restart sshd
 #Git Install
 apt-get update
 apt-get install git -y
-git init && git pull https://github.com/jcotoBan/LKarmada.git
+git init && git pull https://github.com/jcotoBan/multiCluster-multiCloud-demo.git
 
 #Install terraform
 
@@ -39,7 +39,6 @@ apt-get install helm -y
 
 #Terraform Setup
 
-
 terraform -chdir=LKE/clusters/clustersworkdir init
 
 terraform -chdir=LKE/clusters/clustersworkdir plan \
@@ -52,10 +51,9 @@ terraform -chdir=LKE/clusters/clustersworkdir plan \
  
 #Kubernetes clusters setup
 
-echo 'export KUBE_VAR="$(terraform output -state=./=LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_cluster_manager)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_cluster_manager.yaml
-echo 'export KUBE_VAR="$(terraform output -state=./=LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_us)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_us.yaml
-echo 'export KUBE_VAR="$(terraform output -state=./=LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_eu)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_eu.yaml
-echo 'export KUBE_VAR="$(terraform output -state=./=LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_ap)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_ap.yaml
+echo 'export KUBE_VAR="$(terraform output -state=./LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_cluster_manager)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_cluster_manager.yaml
+echo 'export KUBE_VAR="$(terraform output -state=./LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_us)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_us.yaml
+echo 'export KUBE_VAR="$(terraform output -state=./LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_eu)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_eu.yaml
 echo 'alias k=kubectl' >> .bashrc
 source .bashrc
 
