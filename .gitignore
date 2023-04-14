@@ -1,5 +1,5 @@
-LKE/managementInstance/instanceworkdir/instance.tfvars
-LKE/managementInstance/ssh-keys/workshopK*
+managementInstance/instanceworkdir/instance.tfvars
+managementInstance/ssh-keys/workshopK*
 
 # Local .terraform directories and lock/state files
 **/.terraform
