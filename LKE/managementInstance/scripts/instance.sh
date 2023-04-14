@@ -44,8 +44,7 @@ terraform -chdir=LKE/clusters/clustersworkdir init
 terraform -chdir=LKE/clusters/clustersworkdir plan \
  -var-file="clusters.tfvars"
 
-
- terraform -chdir=LKE/clusters/clustersworkdir apply -auto-approve \
+terraform -chdir=LKE/clusters/clustersworkdir apply -auto-approve \
  -var-file="clusters.tfvars"
 
  
@@ -61,6 +60,89 @@ source .bashrc
 #Karmada setup
 
 helm repo add karmada-charts https://raw.githubusercontent.com/karmada-io/karmada/master/charts 
-kubectl get nodes -o jsonpath="{.items[*].status.addresses[?(@.type==\"ExternalIP\")].address}" --kubeconfig=kubeconfig_cluster_manager.yaml > kcip.txt
 
-' 
+#To get the manager cluster ip, seems like first time it doesnt work.
+
+MAX_RETRIES=20
+RETRY_COUNT=0
+ip_regex='^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+
+# Loop until the command succeeds or the maximum number of retries is reached
+while true; do
+    kubectl get nodes -o jsonpath="{.items[*].status.addresses[?(@.type==\"ExternalIP\")].address}" --kubeconfig=kubeconfig_cluster_manager.yaml > kcip.txt
+    ip_address=$(cat kcip.txt)
+    if [[ $ip_address =~ $ip_regex ]]; then
+       echo "Required value retrieved successfully"
+       cat kcip.txt
+       break
+    else
+        RETRY_COUNT=$((RETRY_COUNT+1))
+        if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+            echo "Error: kubectl command failed after $MAX_RETRIES retries"
+            exit 1
+        fi
+        sleep 5
+    fi
+done
+
+helm install karmada karmada-charts/karmada \
+--kubeconfig=kubeconfig_cluster_manager.yaml \
+--create-namespace --namespace karmada-system \
+--set apiServer.hostNetwork=false \
+--set apiServer.serviceType=NodePort \
+--set apiServer.nodePort=32443 \
+--set certs.auto.hosts[0]="kubernetes.default.svc" \
+--set certs.auto.hosts[1]="*.etcd.karmada-system.svc.cluster.local" \
+--set certs.auto.hosts[2]="*.karmada-system.svc.cluster.local" \
+--set certs.auto.hosts[3]="*.karmada-system.svc" \
+--set certs.auto.hosts[4]="localhost" \
+--set certs.auto.hosts[5]="127.0.0.1" \
+--set certs.auto.hosts[6]=$(cat kcip.txt)
+
+sleep 20
+
+kubectl get secret karmada-kubeconfig \
+ --kubeconfig=kubeconfig_cluster_manager.yaml \
+ -n karmada-system \
+ -o jsonpath={.data.kubeconfig} | base64 -d > karmada_config
+
+  sed -i "s|https://karmada-apiserver.karmada-system.svc.cluster.local:5443|https://$(cat kcip.txt):32443|g" karmada_config
+
+sleep 20
+
+kubectl config view --kubeconfig=karmada_config --minify --raw --output 'jsonpath={..cluster.certificate-authority-data}' | base64 -d > caCrt.pem
+kubectl config view --kubeconfig=karmada_config --minify --raw --output 'jsonpath={..user.client-certificate-data}' | base64 -d > crt.pem
+kubectl config view --kubeconfig=karmada_config --minify --raw --output 'jsonpath={..user.client-key-data}' | base64 -d > key.pem
+
+echo "agent:" >> values.yaml && \
+echo "  kubeconfig:" >> values.yaml && \
+echo "    caCrt: |" >> values.yaml && \
+cat caCrt.pem | sed 's/^/      /' >> values.yaml && \
+echo "    crt: |" >> values.yaml && \
+cat crt.pem | sed 's/^/      /' >> values.yaml && \
+echo "    key: |" >> values.yaml && \
+cat key.pem | sed 's/^/      /' >> values.yaml
+
+#Installing karmada on each of the clusters
+
+helm install karmada karmada-charts/karmada \
+--kubeconfig=kubeconfig_us.yaml \
+--create-namespace --namespace karmada-system \
+--set installMode=agent \
+--set agent.clusterName=us \
+--set agent.kubeconfig.server="https://$(cat kcip.txt):32443" \
+--values values.yaml
+
+helm install karmada karmada-charts/karmada \
+--kubeconfig=kubeconfig_eu.yaml \
+--create-namespace --namespace karmada-system \
+--set installMode=agent \
+--set agent.clusterName=eu \
+--set agent.kubeconfig.server="https://$(cat kcip.txt):32443" \
+--values values.yaml
+
+rm caCrt.pem
+rm crt.pem
+rm key.pem
+rm values.yaml
+

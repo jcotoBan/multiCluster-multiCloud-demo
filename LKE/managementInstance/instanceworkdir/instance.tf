@@ -12,7 +12,7 @@ provider "linode" {
 }
 
 resource "linode_instance" "workshop"{
-label = "workshopInstance"
+label = "managementInstance"
 image = "linode/debian11"
 region = "us-southeast"
 type = "g6-nanode-1"
