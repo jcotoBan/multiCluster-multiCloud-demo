@@ -157,3 +157,5 @@ rm kcip.txt
 rm crt.pem
 rm key.pem
 rm values.yaml
+
+mv karmada_config ~/.kube/config
