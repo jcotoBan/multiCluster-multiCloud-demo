@@ -1,0 +1,36 @@
+apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
+metadata:
+ name: redisfollowerpropagation
+spec:
+ resourceSelectors:
+    #Redis Follower
+   - apiVersion: apps/v1
+     kind: Deployment
+     name: redis-follower
+   - apiVersion: v1
+     kind: Service
+     name: redis-follower
+ placement:
+   clusterAffinity:
+     clusterNames:
+       - eu
+       - ap
+       - us
+   replicaScheduling:
+     replicaDivisionPreference: Weighted
+     replicaSchedulingType: Divided
+     weightPreference:
+       staticWeightList:
+         - targetCluster:
+             clusterNames:
+               - us
+           weight: 2
+         - targetCluster:
+             clusterNames:
+               - ap
+           weight: 2
+         - targetCluster:
+             clusterNames:
+               - eu
+           weight: 2

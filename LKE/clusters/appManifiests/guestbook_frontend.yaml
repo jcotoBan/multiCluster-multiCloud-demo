@@ -2,17 +2,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: guestbookfrontend
 spec:
-  replicas: 3
+  replicas: 9
   selector:
     matchLabels:
-        app: guestbook
+        app: guestbookfrontend
         tier: frontend
   template:
     metadata:
       labels:
-        app: guestbook
+        app: guestbookfrontend
         tier: frontend
     spec:
       containers:
@@ -34,12 +34,12 @@ kind: Service
 metadata:
   name: frontend
   labels:
-    app: guestbook
+    app: guestbookfrontend
     tier: frontend
 spec:
   type: LoadBalancer
   ports:
   - port: 80
   selector:
-    app: guestbook
+    app: guestbookfrontend
     tier: frontend
