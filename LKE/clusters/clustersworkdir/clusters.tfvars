@@ -4,7 +4,7 @@ region_manager_lke_cluster = [
     {
         label : "region_manager_lke_cluster"
         k8s_version : "1.25"
-        region : "us-west"
+        region : "us-southeast"
         pools = [
             {
                 type : "g6-standard-2"
@@ -47,11 +47,11 @@ eu_lke_cluster = [
 ]
 
 /****************************************/
-/*ap_lke_cluster = [
+ap_lke_cluster = [
     {
         label : "ap_lke_cluster"
         k8s_version : "1.25"
-        region : "ap-south"
+        region : "ap-northeast"
         pools = [
             {
                 type : "g6-standard-2"
@@ -59,5 +59,5 @@ eu_lke_cluster = [
             }
         ]
     }
-]*/
+]
 

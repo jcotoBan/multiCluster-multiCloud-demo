@@ -8,8 +8,10 @@ chmod 600 /home/k8s_admin/.ssh/authorized_keys
 chmod 700 /home/k8s_admin/.ssh
 chown -R k8s_admin:k8s_admin /home/k8s_admin/.ssh
 echo $'#k8s_admin entry\nk8s_admin ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-sed -i '/^PermitRootLogin\s\w+/{ s//PermitRootLogin no/g; }' /etc/ssh/sshd_config
+sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+sed -i 's/^PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
 systemctl restart sshd
+
 
 #Git Install
 apt-get update
@@ -53,6 +55,7 @@ terraform -chdir=LKE/clusters/clustersworkdir apply -auto-approve \
 echo 'export KUBE_VAR="$(terraform output -state=./LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_cluster_manager)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_cluster_manager.yaml
 echo 'export KUBE_VAR="$(terraform output -state=./LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_us)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_us.yaml
 echo 'export KUBE_VAR="$(terraform output -state=./LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_eu)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_eu.yaml
+echo 'export KUBE_VAR="$(terraform output -state=./LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_ap)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_ap.yaml
 echo 'alias k=kubectl' >> .bashrc
 source .bashrc
 
@@ -99,7 +102,7 @@ helm install karmada karmada-charts/karmada \
 --set certs.auto.hosts[5]="127.0.0.1" \
 --set certs.auto.hosts[6]=$(cat kcip.txt)
 
-sleep 20
+sleep 5
 
 kubectl get secret karmada-kubeconfig \
  --kubeconfig=kubeconfig_cluster_manager.yaml \
@@ -108,7 +111,7 @@ kubectl get secret karmada-kubeconfig \
 
   sed -i "s|https://karmada-apiserver.karmada-system.svc.cluster.local:5443|https://$(cat kcip.txt):32443|g" karmada_config
 
-sleep 20
+sleep 5
 
 kubectl config view --kubeconfig=karmada_config --minify --raw --output 'jsonpath={..cluster.certificate-authority-data}' | base64 -d > caCrt.pem
 kubectl config view --kubeconfig=karmada_config --minify --raw --output 'jsonpath={..user.client-certificate-data}' | base64 -d > crt.pem
@@ -141,9 +144,16 @@ helm install karmada karmada-charts/karmada \
 --set agent.kubeconfig.server="https://$(cat kcip.txt):32443" \
 --values values.yaml
 
+helm install karmada karmada-charts/karmada \
+--kubeconfig=kubeconfig_ap.yaml \
+--create-namespace --namespace karmada-system \
+--set installMode=agent \
+--set agent.clusterName=ap \
+--set agent.kubeconfig.server="https://$(cat kcip.txt):32443" \
+--values values.yaml
+
 rm caCrt.pem
+rm kcip.txt
 rm crt.pem
 rm key.pem
-#rm values.yaml
-
-
+rm values.yaml

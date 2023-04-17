@@ -1,15 +1,30 @@
 apiVersion: policy.karmada.io/v1alpha1
 kind: PropagationPolicy
 metadata:
- name: propagation
+ name: guest_book_app_propagation
 spec:
  resourceSelectors:
+     #Frontend guestbook
    - apiVersion: apps/v1
      kind: Deployment
-     name: protoapp
+     name: frontend
    - apiVersion: v1
      kind: Service
-     name: protoappsvc
+     name: frontend
+     #Redis Leader
+   - apiVersion: apps/v1
+     kind: Deployment
+     name: redis-leader
+   - apiVersion: v1
+     kind: Service
+     name: redis-leader
+    #Redis Follower
+   - apiVersion: apps/v1
+     kind: Deployment
+     name: redis-follower
+   - apiVersion: v1
+     kind: Service
+     name: redis-follower
  placement:
    clusterAffinity:
      clusterNames:

@@ -54,6 +54,22 @@ resource "linode_lke_cluster" "eu_lke_cluster" {
     }
 }
 
+//AP zone cluster
+
+resource "linode_lke_cluster" "ap_lke_cluster" {
+    k8s_version = var.ap_lke_cluster[0].k8s_version
+    label = var.ap_lke_cluster[0].label
+    region = var.ap_lke_cluster[0].region
+
+    dynamic "pool" {
+        for_each = var.ap_lke_cluster[0].pools
+        content {
+            type  = pool.value["type"]
+            count = pool.value["count"]
+        }
+    }
+}
+
 //Export this cluster's attributes
 
 output "kubeconfig_cluster_manager" {
@@ -71,6 +87,12 @@ output "kubeconfig_eu" {
    sensitive = true
 }
 
+output "kubeconfig_ap" {
+   value = linode_lke_cluster.ap_lke_cluster.kubeconfig
+   sensitive = true
+}
+
 variable "region_manager_lke_cluster"{}
 variable "us_lke_cluster"{}
 variable "eu_lke_cluster"{}
+variable "ap_lke_cluster"{}
