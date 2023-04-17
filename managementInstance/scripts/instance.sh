@@ -144,5 +144,6 @@ helm install karmada karmada-charts/karmada \
 rm caCrt.pem
 rm crt.pem
 rm key.pem
-rm values.yaml
+#rm values.yaml
+
 

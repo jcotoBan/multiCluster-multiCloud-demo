@@ -34,6 +34,7 @@ authorized_keys = [linode_sshkey.workshop_key.ssh_key]
   provisioner "remote-exec"{
     inline = [
       "export LINODE_TOKEN=${var.token}",
+      "echo ${var.token} >> pat_token.txt",
       "source ~/.bashrc",
       "chmod +x /tmp/instance.sh",
       "/tmp/instance.sh",
