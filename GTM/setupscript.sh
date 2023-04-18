@@ -24,35 +24,13 @@ cat ./GTM/gtm_tf/locations.txt
 echo '-----------'
 
 # Collect Akamai GTM input information
-echo "Define Akamai GTM variables"
-touch ./GTM/gtm_tf/gtm_variables.txt
-read -p "Enter Akamai Contract ID: " AKAM_CONTRACT_ID
-echo "AKAM_CONTRACT_ID: " $AKAM_CONTRACT_ID >> ./GTM/gtm_tf/gtm_variables.txt
-read -p "Enter Akamai Group ID: " AKAM_GROUP_ID
-echo "AKAM_GROUP_ID: " $AKAM_GROUP_ID >> ./GTM/gtm_tf/gtm_variables.txt
-read -p "Enter Akamai GTM notification email: " GTM_NOTIFICATION_EMAIL
-echo "GTM_NOTIFICATION_EMAIL: " $GTM_NOTIFICATION_EMAIL >> ./GTM/gtm_tf/gtm_variables.txt
-read -p "Enter Akamai GTM Domain name (must end with .akadns.net): " GTM_DOMAIN_NAME
-echo "GTM_DOMAIN_NAME: " $GTM_DOMAIN_NAME >> ./GTM/gtm_tf/gtm_variables.txt
-read -p "Enter Akamai GTM Property name: " GTM_PROPERTY_NAME
-echo "GTM_PROPERTY_NAME: " $GTM_PROPERTY_NAME >> ./GTM/gtm_tf/gtm_variables.txt
-echo '-----------'
-echo "GTM Connfiguration"
-echo "AKAM_CONTRACT_ID: $AKAM_CONTRACT_ID"
-echo "AKAM_GROUP_ID: $AKAM_GROUP_ID"
-echo "GTM_NOTIFICATION_EMAIL: $GTM_NOTIFICATION_EMAIL"
-echo "GTM_DOMAIN_NAME: $GTM_DOMAIN_NAME"
-echo "GTM_PROPERTY_NAME: $GTM_PROPERTY_NAME"
-echo '-----------'
-echo './GTM/gtm_tf/gtm_variables.txt'
-cat ./GTM/gtm_tf/gtm_variables.txt
-echo '-----------'
-
-export AKAM_CONTRACT_ID
-export AKAM_GROUP_ID
-export GTM_NOTIFICATION_EMAIL
-export GTM_DOMAIN_NAME
-export GTM_PROPERTY_NAME
+mapfile -t file_contents < gtm_variables.txt
+for line in "${file_contents[@]}"
+do
+  var_name="$(echo "$line" | awk -F':' '{print $1}')"
+  var_value="$(echo "$line" | awk -F':' '{print $2}')"
+  export "$var_name"="$var_value"
+done
 
 #update TF variables file with collected information
 cd GTM/gtm_tf

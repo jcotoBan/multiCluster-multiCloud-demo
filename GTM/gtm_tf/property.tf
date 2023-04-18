@@ -2,7 +2,7 @@
 resource "akamai_gtm_property" "karmada_setup" {
   domain                      = akamai_gtm_domain.karmada_setup.name # domain
   name                        = var.gtm_property_name            # Property Name
-  type                        = "performance"
+  type                        = "geographic"
   ipv6                        = false
   score_aggregation_type      = "worst"
   stickiness_bonus_percentage = 0

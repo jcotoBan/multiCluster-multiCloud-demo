@@ -1,6 +1,7 @@
 managementInstance/instanceworkdir/terraform.tfvars
 managementInstance/ssh-keys/workshopK*
-GKE/creds/gke.json
+GTM/gtm_variables.txt
+
 
 # Local .terraform directories and lock/state files
 **/.terraform

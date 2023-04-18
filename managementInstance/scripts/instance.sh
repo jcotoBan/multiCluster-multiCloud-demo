@@ -12,13 +12,13 @@ sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
 sed -i 's/^PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
 systemctl restart sshd
 
+
 #jq install
 apt install jq -y
 
 #Git Install
 apt-get update
 apt-get install git -y
-git init && git pull https://github.com/jcotoBan/multiCluster-multiCloud-demo.git
 
 #Install terraform
 
@@ -163,3 +163,5 @@ rm values.yaml
 
 mv karmada_config ~/.kube/config
 chmod 600 ~/.kube/config
+
+bash GTM/setupscript.sh

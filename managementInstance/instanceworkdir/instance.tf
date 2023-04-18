@@ -31,6 +31,30 @@ authorized_keys = [linode_sshkey.workshop_key.ssh_key]
     }
   }
 
+   /*Copying all repo files to be used by remote machine*/
+   provisioner "file"{ 
+    source = "../../../karmada-multicloud-gtm/GTM"
+    destination = "/root/"
+    connection {
+      type = "ssh"
+      host = self.ip_address
+      user = "root"
+      password = var.root_pass
+    }
+  }
+
+  /*Copying all repo files to be used by remote machine*/
+   provisioner "file"{ 
+    source = "../../../karmada-multicloud-gtm/LKE"
+    destination = "/root/"
+    connection {
+      type = "ssh"
+      host = self.ip_address
+      user = "root"
+      password = var.root_pass
+    }
+  }
+
     provisioner "file"{
     source = "~/.edgerc"
     destination = "~/.edgerc"

@@ -1,0 +1,7 @@
+/*
+Here is where you should put your token and root_pass tf vars.
+Just add them and rename the file removing the dummy at the end or add a separate file.
+*/
+
+token = ""
+root_pass = ""
