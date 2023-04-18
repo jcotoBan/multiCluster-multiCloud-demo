@@ -1,1 +1,1 @@
-![](images/arquitectura.jpg)
+![](images/arquitectura.png)
