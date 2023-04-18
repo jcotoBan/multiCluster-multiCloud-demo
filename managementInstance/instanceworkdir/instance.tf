@@ -31,6 +31,17 @@ authorized_keys = [linode_sshkey.workshop_key.ssh_key]
     }
   }
 
+    provisioner "file"{
+    source = "~/.edgerc"
+    destination = "~/.edgerc"
+    connection {
+      type = "ssh"
+      host = self.ip_address
+      user = "root"
+      password = var.root_pass
+    }
+  }
+
   provisioner "remote-exec"{
     inline = [
       "export LINODE_TOKEN=${var.token}",
