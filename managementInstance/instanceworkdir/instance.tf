@@ -57,7 +57,7 @@ authorized_keys = [linode_sshkey.workshop_key.ssh_key]
 
     provisioner "file"{
     source = "~/.edgerc"
-    destination = "~/.edgerc"
+    destination = "/root/.edgerc"
     connection {
       type = "ssh"
       host = self.ip_address
