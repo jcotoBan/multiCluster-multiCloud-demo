@@ -7,10 +7,10 @@ spec:
      #Frontend guestbook
    - apiVersion: apps/v1
      kind: Deployment
-     name: frontend
+     name: guestbookfrontend
    - apiVersion: v1
      kind: Service
-     name: frontend
+     name: guestbookfrontend
  placement:
    clusterAffinity:
      clusterNames:

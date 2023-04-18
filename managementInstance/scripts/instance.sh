@@ -12,6 +12,8 @@ sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
 sed -i 's/^PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
 systemctl restart sshd
 
+#jq install
+apt install jq -y
 
 #Git Install
 apt-get update
@@ -56,6 +58,7 @@ echo 'export KUBE_VAR="$(terraform output -state=./LKE/clusters/clustersworkdir/
 echo 'export KUBE_VAR="$(terraform output -state=./LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_us)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_us.yaml
 echo 'export KUBE_VAR="$(terraform output -state=./LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_eu)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_eu.yaml
 echo 'export KUBE_VAR="$(terraform output -state=./LKE/clusters/clustersworkdir/terraform.tfstate kubeconfig_ap)"' >> .bashrc && source .bashrc && echo $KUBE_VAR | base64 -di > kubeconfig_ap.yaml
+chmod 600 kubeconfig_*
 echo 'alias k=kubectl' >> .bashrc
 source .bashrc
 
@@ -159,3 +162,4 @@ rm key.pem
 rm values.yaml
 
 mv karmada_config ~/.kube/config
+chmod 600 ~/.kube/config
